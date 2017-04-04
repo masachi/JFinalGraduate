@@ -1,11 +1,6 @@
 package common.config;
 
-import com.demo.api.item.ItemController;
-import com.demo.api.order.OrderController;
-import com.demo.api.user.UserController;
-import com.demo.blog.BlogController;
-import com.demo.common.model._MappingKit;
-import com.demo.index.IndexController;
+import api.user.UserController;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -16,6 +11,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
+import com.jfinal.template.Engine;
 
 /**
  * API引导式配置
@@ -27,21 +23,21 @@ public class DemoConfig extends JFinalConfig {
 	 */
 	public void configConstant(Constants me) {
 		// 加载少量必要配置，随后可用PropKit.get(...)获取值
-		PropKit.use("a_little_config.txt");
-		me.setDevMode(PropKit.getBoolean("devMode", false));
+
 	}
 	
 	/**
 	 * 配置路由
 	 */
 	public void configRoute(Routes me) {
-		me.add("/", IndexController.class, "/index");	// 第三个参数为该Controller的视图存放路径
-		me.add("/blog", BlogController.class);			// 第三个参数省略时默认与第一个参数值相同，在此即为 "/blog"
 		me.add("/api/user",UserController.class);
-		me.add("/api/order",OrderController.class);
-		me.add("/api/item",ItemController.class);
 	}
-	
+
+	@Override
+	public void configEngine(Engine me) {
+
+	}
+
 	public static C3p0Plugin createC3p0Plugin() {
 		return new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
 	}
@@ -57,9 +53,7 @@ public class DemoConfig extends JFinalConfig {
 		// 配置ActiveRecord插件
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(C3p0Plugin);
 		me.add(arp);
-		
-		// 所有配置在 MappingKit 中搞定
-		_MappingKit.mapping(arp);
+
 	}
 	
 	/**
